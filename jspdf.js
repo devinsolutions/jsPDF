@@ -206,6 +206,8 @@ var jsPDF = (function (global) {
       objectNumber = 2, // 'n' Current object number
       outToPages = !1, // switches where out() prints. outToPages true = push to pages obj. outToPages false = doc builder content
       offsets = [], // List of offsets. Activated and reset by buildDocument(). Pupulated by various calls buildDocument makes.
+      blendList = [],
+      blendMap = {},
       fonts = {}, // collection of font objects, where key is fontKey - a dynamically created label for a given font.
       fontmap = {}, // mapping structure fontName > fontStyle > font key - performance layer. See addFont()
       activeFontKey, // will be string representing the KEY of the font as combination of fontName + fontStyle
@@ -543,6 +545,15 @@ var jsPDF = (function (global) {
           }
         }
       },
+      putBlendModes = function () {
+        for (var i = 0; i < blendList.length; i++) {
+          var blendMode = blendList[i];
+          blendList[i].objectNumber = newObject();
+          out('<</Type /ExtGState /ca ' + blendMode.fill + ' /CA ' + blendMode.stroke + ' /BM /' +
+            blendMode.mode + '>>');
+          out('endobj');
+        }
+      },
       putXobjectDict = function () {
         // Loop through images, or other data objects
         events.publish('putXobjectDict');
@@ -561,8 +572,19 @@ var jsPDF = (function (global) {
         out('/XObject <<');
         putXobjectDict();
         out('>>');
+
+        var blendListCount = blendList.length;
+
+        if (blendListCount > 0) {
+            out('/ExtGState <<');
+            for (var i = 0; i < blendListCount; i++) {
+                out('/GS' + i + ' ' + blendList[i].objectNumber + ' 0 R');
+            }
+            out('>>');
+        }
       },
       putResources = function () {
+        putBlendModes();
         putFonts();
         events.publish('putResources');
         // Resource dictionary
@@ -2376,6 +2398,50 @@ var jsPDF = (function (global) {
     API.setLineWidth = function (width) {
       out((width * k).toFixed(2) + ' w');
       return this;
+    };
+
+    /**
+     * Sets the alpha blending channel.
+     *
+     * @param {Number} alpha must be a value between 0.0 (fully transparent) to 1.0 (fully opaque).
+     * Values outside of this range result in an error.
+     * @param {String} blendMode must be one of "Normal", "Multiply", "Screen", "Overlay", "Darken",
+     * "Lighten", "ColorDodge", "ColorBurn","HardLight", "SoftLight", "Difference", "Exclusion",
+     * "Hue", "Saturation", "Color", or "Luminosity". An empty string is replaced with "Normal".
+     * @function
+     * @returns {jsPDF}
+     * @methodOf jsPDF#
+     * @name setAlpha
+     */
+    API.setAlpha = function (alpha, blendMode='Normal') {
+        var blendModes = ['Normal', 'Multiply', 'Screen', 'Overlay', 'Darken', 'Lighten', 'ColorDodge',
+          'ColorBurn', 'HardLight', 'SoftLight', 'Difference', 'Exclusion', 'Hue', 'Saturation',
+          'Color', 'Luminosity'];
+
+        if (alpha < 0 || alpha > 1) {
+          throw new Error('Alpha value (0.0 - 1.0) is out of range: ' + alpha);
+        }
+
+        if (!blendModes.includes(blendMode)) {
+          throw new Error('Unrecognized blend mode: ' + blendMode);
+        }
+
+        var key = blendMode + alpha;
+        var position = blendMap[key];
+
+        if (position == undefined) {
+            position = blendList.length;
+            blendList.push({
+                stroke: alpha,
+                fill: alpha,
+                mode: 'normal',
+            });
+            blendMap[key] = position;
+        }
+
+        out('/GS' + position + ' gs');
+
+        return this;
     };
 
     /**
