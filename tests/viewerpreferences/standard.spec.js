@@ -1,4 +1,4 @@
-'use strict'
+
 /* global describe, it, expect, jsPDF, comparePdf */
 /**
  * Standard spec tests
@@ -61,9 +61,31 @@ describe('viewerpreferences plugin', () => {
   })
   it('PrintPageRange', () => {
     const doc = new jsPDF()
-    doc.text(10, 10, 'This is a test')
+    doc.text(10, 10, 'Print This Page');
+	doc.addPage();
+    doc.text(10, 10, 'Print This Page');
+	doc.addPage();
+    doc.text(10, 10, 'Print This Page');
+	doc.addPage();
+    doc.text(10, 10, 'Print Not This Page');
+	doc.addPage();
+    doc.text(10, 10, 'Print This Page');
+	doc.addPage();
+    doc.text(10, 10, 'Print This Page');
+	doc.addPage();
+    doc.text(10, 10, 'Print This Page');
+	doc.addPage();
+    doc.text(10, 10, 'Print This Page');
+	doc.addPage();
+    doc.text(10, 10, 'Print This Page');
     doc.viewerPreferences({'PrintPageRange' : [[1,3],[5,9]]})
     
     comparePdf(doc.output(), 'PrintPageRange.pdf', 'viewerpreferences')
+  })
+  it('ViewArea NumCopies', () => {
+    const doc = new jsPDF()
+    doc.viewerPreferences({'NumCopies' : 10})
+    
+    comparePdf(doc.output(), 'NumCopies.pdf', 'viewerpreferences')
   })
 })

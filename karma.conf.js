@@ -9,32 +9,29 @@ module.exports = (config) => {
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
-
     // list of files / patterns to load in the browser
     files: [
-       'libs/polyfill.js',
-      'jspdf.js',
+      'tests/utils/polyfill.js',
+      'src/libs/polyfill.js',
+      'node_modules/promise-polyfill/dist/polyfill.js',
+      'src/jspdf.js',  
       {
-        pattern: 'plugins/*.js',
+        pattern: 'src/libs/*.js',
         included: true
       },
-      'libs/ttffont.js',
-      './libs/png_support/png.js',
-      './libs/png_support/zlib.js',
-      'libs/adler32cs.js',
-      'libs/Deflater.js',
-      'libs/BMPDecoder.js',
+      {
+        pattern: 'src/modules/*.js',
+        included: true
+      }, 
+      'node_modules/canvg/dist/browser/canvg.js',
       'node_modules/omggif/omggif.js',
-      'libs/JPEGEncoder.js',
-      'libs/html2canvas/dist/html2canvas.js',
-      'libs/rgbcolor.js',
-      'libs/canvg_context2d/libs/StackBlur.js',
-      'libs/canvg_context2d/canvg.js',
+      'node_modules/html2canvas/dist/html2canvas.js',
       'tests/utils/compare.js',
       {
         pattern: 'tests/**/*.spec.js',
         included: true
-      }, {
+      },
+      {
         pattern: 'tests/**/reference/*.*',
         included: false,
         served: true
@@ -47,15 +44,17 @@ module.exports = (config) => {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'jspdf.js': 'coverage',
-      'plugins/*.js': 'coverage',
-      'tests/!(acroform)*/*.js': 'babel'
+      'src/jspdf.js': 'coverage',
+      'src/modules/*.js': 'coverage',
+      'src/libs/*.js': 'coverage',
+      'tests/!(acroform|unicode)*/*.js': 'babel'
     },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['mocha', 'coverage'],
+	
 
     // web server port
     port: 9876,
@@ -72,7 +71,7 @@ module.exports = (config) => {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome', 'Firefox'],
+    browsers: ['IE'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
@@ -95,10 +94,9 @@ module.exports = (config) => {
     },
     babelPreprocessor: {
       options: {
-        presets: ['es2015'],
+        presets: ["@babel/env"], // "@babel/preset-env"
         sourceMap: 'inline'
       }
     }
-
   })
 }

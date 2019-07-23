@@ -7,7 +7,6 @@ var jsPDFEditor = function() {
 	var editor,demos = {
 		'images.js': 'Images',
 		'font-faces.js': 'Font faces, text alignment and rotation',
-		'from-html.js': 'HTML Renderer (Early stages)',
 		'two-page.js': 'Two page Hello World',
 		'circles.js': 'Circles',
 		'font-size.js': 'Font sizes',
@@ -19,9 +18,9 @@ var jsPDFEditor = function() {
 		'text-colors.js': 'Text colors',
 		'triangles.js': 'Triangles',
 		'user-input.js': 'User input',
-		//'html2canvas.js': '** NEW: addHTML()',
 		'acroforms.js': 'AcroForms',
-		'autoprint.js': 'Auto print'
+		'autoprint.js': 'Auto print',
+		'japanese.js': 'Japanese'
 	};
 
 	var aceEditor = function() {
@@ -87,7 +86,7 @@ var jsPDFEditor = function() {
 			source += "var doc = new jsPDF();\n";
 			source += "\n";
 			source += "doc.setFontSize(40);\n";
-			source += "doc.text(40, 30, \"Octocat loves jsPDF\", 4);\n";
+			source += "doc.text(\"Octocat loves jsPDF\", 40, 30, 4);\n";
 			source += "doc.addImage(imgData, 10, 40, 180, 180);\n";
 			editor.setValue(source);
 			editor.gotoLine(0);
@@ -162,14 +161,8 @@ var jsPDFEditor = function() {
 					eval('try{' + editor.getValue() + '} catch(e) { console.error(e.message,e.stack,e); }');
 				}
 				if (typeof doc !== 'undefined') try {
-					if (navigator.msSaveBlob) {
-						// var string = doc.output('datauristring');
-						string = 'http://microsoft.com/thisdoesnotexists';
-						console.error('Sorry, we cannot show live PDFs in MSIE')
-					} else {
-						var string = doc.output('bloburi');
-					}
-					$('.preview-pane').attr('src', string);
+					var string = doc.output('datauristring');
+					PDFObject.embed(string, document.getElementById("preview-pane"));
 				} catch(e) {
 					alert('Error ' + e);
 				}

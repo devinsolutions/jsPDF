@@ -1,4 +1,4 @@
-'use strict'
+
 /* global describe, xit, it, jsPDF, comparePdf, jasmine, expect */
 /**
  * Standard spec tests
@@ -8,22 +8,12 @@
  */
 
 describe('jsPDF init options', () => {
-  xit('should make a compressed document', () => {
+  it('should make a compressed document', () => {
     const doc = jsPDF({
       compress: true
     })
     doc.text(10, 10, 'This is a test')
     comparePdf(doc.output(), 'compress.pdf', 'init')
-  })
-
-  // @TODO: Make sure this is what we want
-  xit('should silently fail compressing when adler32cs is not present', () => {
-    delete window.adler32cs
-    const doc = jsPDF({
-      compress: true
-    })
-    doc.text(10, 10, 'This is a test')
-    doc.output()
   })
 
   it('should make a landscape document', () => {
@@ -83,16 +73,6 @@ describe('jsPDF init options', () => {
     const doc = jsPDF()
     expect(doc.output('datauristring')).toContain('data:')
     expect(doc.output('dataurlstring')).toContain('data:')
-  })
-
-  // @TODO Figure out a way to test this
-  xit('should return a datauri', () => {
-    const doc = jsPDF()
-    doc.output('datauri')
-    window.stop()
-
-    doc.output('dataurl')
-    window.stop()
   })
 
   it('should open a new window', () => {
@@ -169,13 +149,13 @@ describe('jsPDF init options', () => {
   it('should warn me about an invalid unit', () => {
     expect(() => {
       jsPDF({ unit: 'invalid' })
-    }).toThrow('Invalid unit: invalid')
+    }).toThrow(new Error('Invalid unit: invalid'))
   })
 
   it('should warn me about an invalid unit when passed as second argument', () => {
     expect(() => {
       jsPDF('portrait', 'invalid')
-    }).toThrow('Invalid unit: invalid')
+    }).toThrow(new Error('Invalid unit: invalid'))
   })
   
   it('getCreationDate', () => {

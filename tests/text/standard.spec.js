@@ -1,4 +1,4 @@
-'use strict'
+
 /* global describe, it, expect, jsPDF, comparePdf */
 /**
  * Standard spec tests
@@ -169,7 +169,7 @@ break`)
     expect(() => {
       const doc = jsPDF()
       doc.text(10, 10, 43290943)
-    }).toThrow(new Error('Type of text must be string or Array. "43290943" is not recognized.'))
+    }).toThrow(new Error('Type of text must be string or Array. "10" is not recognized.'))
   })
 
   it('should throw an error when passed incorrect alignment', () => {
@@ -181,10 +181,10 @@ break`)
 
   it('should render letter spaced text', () => {
     const doc = jsPDF()
-    doc.lstext('hello', 10, 10, 2)
-    doc.lstext('hello', 10, 20, 5)
-    doc.lstext('hello', 10, 30, 10)
-
+    doc.lstext('hello', 10, 10, 0)
+    doc.lstext('hello', 10, 20, 2)
+    doc.lstext('hello', 10, 30, 5)
+    doc.lstext('hello', 10, 40, 10)
     comparePdf(doc.output(), 'letter-spacing.pdf', 'text')
   })
 })
